@@ -2,6 +2,9 @@ source "https://rubygems.org"
 
 ruby "3.3.0"
 
+# 画像加工・合成用
+gem 'cloudinary'
+
 # 画像アップロード用
 gem 'carrierwave', '~> 2.0'
 
