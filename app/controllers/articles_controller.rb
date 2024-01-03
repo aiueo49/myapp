@@ -25,28 +25,37 @@ class ArticlesController < ApplicationController
 
     respond_to do |format|
       if @article.save
-        # Cloudinaryでファイルをアップロードおよび加工する処理
-        uploaded_image = Cloudinary::Uploader.upload(params[:article][:image].tempfile.path,
+        # Upload the image and get its dimensions
+        uploaded_image = Cloudinary::Uploader.upload(params[:article][:image].tempfile.path)
+        image_width = uploaded_image["width"]
+
+        # Calculate the font size based on the image width
+        font_size = image_width / 10
+
+        # Create the text overlay with the calculated font size
+        cloudinary_url = Cloudinary::Utils.cloudinary_url(uploaded_image["public_id"],
           transformation: [
             {
-              overlay: "text:Arial_200_bold:#{@article.title}", # テキストのオーバーレイ
-              color: "orange", # テキストの色
-              gravity: "north_west", # テキストの位置（左上）
-              y: 50, # テキストのy位置の微調整
-              x: 50  # テキストのx位置の微調整
+              overlay: {
+                font_family: "Arial",
+                font_size: font_size,
+                font_weight: "bold",
+                text: @article.title
+              },
+              color: "orange",
+              gravity: "north_west",
+              y: 50,
+              x: 50
             }
           ]
         )
 
-        # アップロードしたファイルのURLを取得
-        cloudinary_url = uploaded_image["url"]
-
-        # ArticleモデルにURLを保存
+        # Save the URL in the Article model
         @article.remote_image_url = cloudinary_url
 
-        # CarrierWaveのアップローダーオブジェクトを保存
+        # Save the uploader object of CarrierWave
         @article.save
-        
+
         format.html { redirect_to article_url(@article), notice: "Article was successfully created." }
         format.json { render :show, status: :created, location: @article }
       else
