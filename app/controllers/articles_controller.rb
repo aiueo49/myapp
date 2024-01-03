@@ -43,7 +43,7 @@ class ArticlesController < ApplicationController
                 text: @article.title
               },
               color: "orange",
-              gravity: "north",
+              gravity: params[:article][:text_position],
               y: 50
             }
           ]
