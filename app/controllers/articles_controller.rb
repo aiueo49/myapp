@@ -25,6 +25,28 @@ class ArticlesController < ApplicationController
 
     respond_to do |format|
       if @article.save
+        # Cloudinaryでファイルをアップロードおよび加工する処理
+        uploaded_image = Cloudinary::Uploader.upload(params[:article][:image].tempfile.path,
+          transformation: [
+            {
+              overlay: "text:Arial_200_bold:#{@article.title}", # テキストのオーバーレイ
+              color: "orange", # テキストの色
+              gravity: "north_west", # テキストの位置（左上）
+              y: 50, # テキストのy位置の微調整
+              x: 50  # テキストのx位置の微調整
+            }
+          ]
+        )
+
+        # アップロードしたファイルのURLを取得
+        cloudinary_url = uploaded_image["url"]
+
+        # ArticleモデルにURLを保存
+        @article.remote_image_url = cloudinary_url
+
+        # CarrierWaveのアップローダーオブジェクトを保存
+        @article.save
+        
         format.html { redirect_to article_url(@article), notice: "Article was successfully created." }
         format.json { render :show, status: :created, location: @article }
       else
