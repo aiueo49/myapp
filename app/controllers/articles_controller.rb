@@ -43,9 +43,8 @@ class ArticlesController < ApplicationController
                 text: @article.title
               },
               color: "orange",
-              gravity: "north_west",
-              y: 50,
-              x: 50
+              gravity: "north",
+              y: 50
             }
           ]
         )
